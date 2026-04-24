@@ -1,6 +1,7 @@
 package com.commerceapp.admin.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class Admin {
     @Column(nullable = false)
     private String password;
     @Column(nullable = false, length = 20)
+    @Pattern(regexp = "^010-\\d{4}-\\d{4}$")
     private String phoneNumber;
     @Column(nullable = false, length = 20)
     private String role;

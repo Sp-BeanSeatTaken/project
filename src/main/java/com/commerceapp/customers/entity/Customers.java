@@ -1,11 +1,10 @@
 package com.commerceapp.customers.entity;
 
 import com.commerceapp.common.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "customers")
 public class Customers extends BaseEntity {
 
     /*========== 속성 ===========*/
@@ -29,7 +28,7 @@ public class Customers extends BaseEntity {
 
     protected  Customers() {
     }
-    public Customers(String name, String email, String password, String phoneNumber, String status) {
+    public Customers(String name, String email, String password, String phoneNumber) {
         this.name = name;
         this.email = email;
         this.password = password;

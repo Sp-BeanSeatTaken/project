@@ -2,7 +2,11 @@ package com.commerceapp.customers.entity;
 
 import com.commerceapp.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Entity
 @Table(name = "customers")
 public class Customers extends BaseEntity {
@@ -26,8 +30,6 @@ public class Customers extends BaseEntity {
 
     /*========== 생성자 ===========*/
 
-    protected  Customers() {
-    }
     public Customers(String name, String email, String password, String phoneNumber) {
         this.name = name;
         this.email = email;

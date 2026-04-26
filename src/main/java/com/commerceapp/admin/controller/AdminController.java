@@ -74,4 +74,15 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body("관리자 상태 변경이 완료되었습니다.");
     }
 
+    @PatchMapping("/reject/{adminId}")
+    public ResponseEntity<String> rejectAdmin(
+            @PathVariable Long adminId,
+            @Valid @RequestBody AdminRejectReasonRequest request){
+
+        adminService.rejectAdmin(adminId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body("관리자 가입이 거부되었습니다.");
+
+    }
+
 }

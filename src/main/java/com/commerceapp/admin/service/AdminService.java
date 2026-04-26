@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AdminService {
@@ -97,6 +99,18 @@ public class AdminService {
         } else {
             throw new IllegalArgumentException("잘못된 상태 변경 요청입니다.");
         }
+    }
+
+    @Transactional
+    public void rejectAdmin(Long adminId, AdminRejectReasonRequest request){
+        Admin admin = adminRepository.findById(adminId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
+        );
+        if (!AdminStatus.PENDING.getDatabaseValue().equals(admin.getStatus())){
+            throw new IllegalStateException("승인대기 상태인 관리자만 거부할 수 있습니다.");
+        }
+
+        admin.reject(request.getRejectReason(), LocalDateTime.now());
     }
 
 }

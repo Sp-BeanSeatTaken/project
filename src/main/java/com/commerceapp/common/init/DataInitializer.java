@@ -8,6 +8,7 @@ import com.commerceapp.product.entity.Product.ProductStatus;
 import com.commerceapp.product.repository.ProductRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 // customer, product 임의 생성
+@Slf4j
 @Component
 @RequiredArgsConstructor
 @Profile("local")
@@ -60,6 +62,7 @@ public class DataInitializer {
         }
 
         customerRepository.saveAll(customers);
+        log.info("고객 20명 생성 및 활성화 완료.");
     }
 
     // 📦 상품 100개 생성 (카테고리 포함)
@@ -97,5 +100,6 @@ public class DataInitializer {
         }
 
         productRepository.saveAll(products);
+        log.info("상품 100개 생성 및 활성화 완료. (랜덤으로 품절, 단종 있음)");
     }
 }

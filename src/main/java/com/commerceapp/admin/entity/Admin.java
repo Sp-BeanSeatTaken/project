@@ -76,5 +76,9 @@ public class Admin extends BaseEntity {
         this.rejectedAt = currentTime;
     }
 
+    public void changeRole(String newRole){
+        this.role = newRole;
+    }
+
 
 }

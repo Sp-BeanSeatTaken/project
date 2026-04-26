@@ -73,8 +73,16 @@ public class AdminService {
                 request.getEmail(),
                 request.getPhoneNumber()
         );
-        Admin updateAdmin = adminRepository.save(admin);
 
+    }
+
+    @Transactional
+    public void changeAdminRole(Long adminId, AdminRoleUpdateRequest request){
+        Admin admin = adminRepository.findById(adminId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
+        );
+
+        admin.changeRole(request.getRole());
     }
 
 }

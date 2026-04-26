@@ -35,7 +35,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleIllegalStateException(IllegalStateException e){
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body("상태 오류:" + e.getMessage());
+                .body("상태:" + e.getMessage());
     }
+
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<String> handleHttpMessageNotReadableException(){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("잘못된 역할 변경 또는 상태변경 요청입니다.");
+    }
+
 
 }

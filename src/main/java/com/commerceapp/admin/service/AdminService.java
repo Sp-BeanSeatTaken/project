@@ -102,6 +102,18 @@ public class AdminService {
     }
 
     @Transactional
+    public void approveAdmin(Long adminId){
+        Admin admin = adminRepository.findById(adminId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
+        );
+        if (!AdminStatus.PENDING.getDatabaseValue().equals(admin.getStatus())){
+            throw new IllegalStateException("승인대기 상태인 관리자만 거부할 수 있습니다.");
+        }
+
+        admin.activate(LocalDateTime.now());
+    }
+
+    @Transactional
     public void rejectAdmin(Long adminId, AdminRejectReasonRequest request){
         Admin admin = adminRepository.findById(adminId).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")

@@ -74,6 +74,15 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body("관리자 상태 변경이 완료되었습니다.");
     }
 
+    @PatchMapping("/approve/{adminId}")
+    public ResponseEntity<String> approveAdmin(@PathVariable Long adminId) {
+
+        adminService.approveAdmin(adminId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("관리자 가입이 승인되었습니다.");
+
+    }
+
     @PatchMapping("/reject/{adminId}")
     public ResponseEntity<String> rejectAdmin(
             @PathVariable Long adminId,

@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleHttpMessageNotReadableException(){
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body("잘못된 역할 변경 또는 상태변경 요청입니다.");
+                .body("잘못된 변경 요청입니다.");
     }
 
 

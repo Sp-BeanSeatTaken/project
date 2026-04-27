@@ -1,4 +1,4 @@
-package com.commerceapp.common.entity;
+package com.commerceapp.orderitem.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

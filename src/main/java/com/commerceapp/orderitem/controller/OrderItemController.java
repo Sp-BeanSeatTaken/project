@@ -1,4 +1,4 @@
-package com.commerceapp.common.controller;
+package com.commerceapp.orderitem.controller;
 
 import org.springframework.web.bind.annotation.*;
 

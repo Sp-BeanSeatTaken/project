@@ -1,4 +1,4 @@
-package com.commerceapp.customers.dto;
+package com.commerceapp.customer.dto;
 
 import lombok.Getter;
 

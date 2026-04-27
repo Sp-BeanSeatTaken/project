@@ -1,6 +1,6 @@
-package com.commerceapp.customers.dto;
+package com.commerceapp.customer.dto;
 
-import com.commerceapp.customers.entity.Customers;
+import com.commerceapp.customer.entity.Customer;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ public class CustomerDetailResponse {
     private String status;
     private LocalDateTime createdAt;
 
-    public CustomerDetailResponse(Customers customers) {
+    public CustomerDetailResponse(Customer customers) {
         this.id = customers.getId();
         this.name = customers.getName();
         this.email = customers.getEmail();

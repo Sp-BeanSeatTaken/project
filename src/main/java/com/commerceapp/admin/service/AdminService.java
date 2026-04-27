@@ -99,6 +99,16 @@ public class AdminService {
     }
 
     @Transactional
+    public void updateMyPassword(Long adminId, AdminMyPasswordUpdateRequest request){
+        Admin admin = adminRepository.findById(adminId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
+        );
+        admin.updateMyPassword(
+                request.getPassword()
+        );
+    }
+
+    @Transactional
     public void changeAdminRole(Long adminId, AdminRoleUpdateRequest request){
         Admin admin = adminRepository.findById(adminId).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")

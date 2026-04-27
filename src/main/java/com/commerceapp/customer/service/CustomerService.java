@@ -1,5 +1,6 @@
 package com.commerceapp.customer.service;
 
+import com.commerceapp.common.exception.NotFoundException;
 import com.commerceapp.customer.entity.Customer;
 import com.commerceapp.customer.repository.CustomerRepository;
 import org.springframework.data.domain.Page;
@@ -24,24 +25,29 @@ public class CustomerService {
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
 
-
+        String keywordParam = (keyword == null) ? "" : keyword;
+        String statusParam = (status == null || status.isEmpty()) ? null : status;
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        String statusParam = (status == null || status.isEmpty()) ? null : status;
-
-        return customerRepository.findByKeywordAndStatus(keyword, statusParam, pageable);
+        return customerRepository.findByKeywordAndStatus(keywordParam, statusParam, pageable);
     }
 
     @Transactional(readOnly = true)
     public Customer getCustomer(Long id) {
-        return customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 고객이 존재하지 않습니다."));
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("해당 고객이 존재하지 않습니다."));
+
+        if (customer.getIsDeleted()) {
+            throw new NotFoundException("삭제 된 고객입니다.");
+        }
+
+        return customer;
     }
 
     @Transactional
     public Customer updateCustomer(Long id, String name, String email, String phoneNumber) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 고객이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("해당 고객이 존재하지 않습니다."));
         customer.updateCustomers(name, email, phoneNumber);
         return customer;
     }
@@ -49,7 +55,7 @@ public class CustomerService {
     @Transactional
     public Customer updateStatus(Long id, String status) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 고객이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("해당 고객이 존재하지 않습니다."));
         customer.updateStatus(status);
         return customer;
     }
@@ -57,7 +63,7 @@ public class CustomerService {
     @Transactional
     public Customer deleteCustomer(Long id) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 고객이 없습니다"));
+                .orElseThrow(() -> new NotFoundException("해당 고객이 없습니다"));
         customer.delete();
         return customer;
     }

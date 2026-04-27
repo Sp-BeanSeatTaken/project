@@ -36,6 +36,19 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body("로그인 성공!");
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return ResponseEntity.ok("성공적으로 로그아웃 되었습니다.");
+    }
+
     @GetMapping("/{adminId}")
     public ResponseEntity<AdminDetailResponse> getAdminDetail(@PathVariable Long adminId){
 

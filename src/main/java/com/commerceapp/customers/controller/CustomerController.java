@@ -2,6 +2,7 @@ package com.commerceapp.customers.controller;
 
 import com.commerceapp.customers.dto.CustomerDetailResponse;
 import com.commerceapp.customers.dto.CustomerListResponse;
+import com.commerceapp.customers.dto.CustomerUpdateRequest;
 import com.commerceapp.customers.service.CustomerService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -32,5 +33,10 @@ public class CustomerController {
     @GetMapping("/{id}")
     public CustomerDetailResponse getCustomer(@PathVariable Long id) {
         return new CustomerDetailResponse(customerService.getCustomer(id));
+    }
+
+    @PatchMapping("/{id}")
+    public CustomerDetailResponse updateCustomer(@PathVariable Long id, @RequestBody CustomerUpdateRequest request) {
+        return new CustomerDetailResponse(customerService.updateCustomer(id, request.getName(), request.getEmail(), request.getPhoneNumber()));
     }
 }

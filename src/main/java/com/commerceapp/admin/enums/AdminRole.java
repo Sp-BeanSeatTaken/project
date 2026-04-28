@@ -1,6 +1,5 @@
 package com.commerceapp.admin.enums;
 
-
 import lombok.Getter;
 
 @Getter
@@ -11,7 +10,6 @@ public enum AdminRole {
     SUPER("슈퍼관리자");
 
     private final String databaseValue;
-
 
     AdminRole(String databaseValue) {
         this.databaseValue = databaseValue;

@@ -8,7 +8,7 @@ import com.commerceapp.customer.repository.CustomerRepository;
 import com.commerceapp.order.dto.*;
 import com.commerceapp.order.entity.Order;
 import com.commerceapp.order.entity.OrderItem;
-import com.commerceapp.order.entity.OrderStatus;
+import com.commerceapp.order.entity.enums.OrderStatus;
 import com.commerceapp.order.repository.OrderRepository;
 import com.commerceapp.product.entity.Product;
 import com.commerceapp.product.repository.ProductRepository;

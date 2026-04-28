@@ -1,7 +1,7 @@
 package com.commerceapp.order.dto;
 
 import com.commerceapp.order.entity.Order;
-import com.commerceapp.order.entity.OrderStatus;
+import com.commerceapp.order.entity.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 

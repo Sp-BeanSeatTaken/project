@@ -3,6 +3,7 @@ package com.commerceapp.order.entity;
 import com.commerceapp.admin.entity.Admin;
 import com.commerceapp.common.entity.BaseEntity;
 import com.commerceapp.customer.entity.Customer;
+import com.commerceapp.order.entity.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

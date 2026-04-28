@@ -1,11 +1,10 @@
 package com.commerceapp.product.controller;
 
-import com.commerceapp.product.dto.ProductCreateRequest;
-import com.commerceapp.product.dto.ProductDetailResponse;
-import com.commerceapp.product.dto.ProductResponse;
-import com.commerceapp.product.dto.ProductUpdateRequest;
+import com.commerceapp.product.dto.*;
 import com.commerceapp.product.service.ProductService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,25 +13,31 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
-
-    //속성
     private final ProductService productService;
 
     // 상품 등록
     @PostMapping
-    public ProductDetailResponse create(@RequestBody ProductCreateRequest request) {
-        String adminName = "관리자";
-        String adminEmail = "admintest@product.com";
+    public ResponseEntity<ProductDetailResponse> create(
+            @RequestBody ProductCreateRequest request,
+            HttpSession session
+    ) {
 
-        return productService.create(request, adminName, adminEmail);
+        return ResponseEntity.ok(productService.create(request, session));
     }
 
     // 상품 전체 조회
     @GetMapping
-    public List<ProductResponse> getAllproducts() {
-        return productService.getAllproducts();
+    public PageResponse<ProductResponse> getProducts(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String state,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        return productService.getAllproducts(keyword, category, state, page, size, sortBy, direction);
     }
-
 
     // 상품 상세 조회
     @GetMapping("/{productId}")

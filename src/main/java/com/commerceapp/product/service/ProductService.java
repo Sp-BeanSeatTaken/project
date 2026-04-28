@@ -1,11 +1,20 @@
 package com.commerceapp.product.service;
 
+import com.commerceapp.admin.dto.AdminLoginSession;
+import com.commerceapp.admin.entity.Admin;
+import com.commerceapp.admin.repository.AdminRepository;
+import com.commerceapp.product.dto.PageResponse;
 import com.commerceapp.product.dto.ProductResponse;
 import com.commerceapp.product.entity.Product;
 import com.commerceapp.product.dto.ProductCreateRequest;
 import com.commerceapp.product.dto.ProductDetailResponse;
 import com.commerceapp.product.repository.ProductRepository;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,41 +24,67 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-
     private final ProductRepository productRepository;
+    private final AdminRepository adminRepository;
 
-    // 상품 등록
+    // 등록
     @Transactional
-    // 컨트롤러 -> 데이터 받기
-    public ProductDetailResponse create(ProductCreateRequest request, String adminName, String adminEmail) {
-        // 엔티티 생성
+    public ProductDetailResponse create(ProductCreateRequest request, HttpSession session) {
+        AdminLoginSession loginAdmin = (AdminLoginSession) session.getAttribute("loginAdmin");
+
+        if (loginAdmin == null) {
+            throw new IllegalArgumentException("관리자 로그인 후 이용 가능합니다.");
+        }
+
+        Admin admin = adminRepository.findById(loginAdmin.getId())
+                .orElseThrow(() -> new IllegalArgumentException("관리자 정보를 찾을 수 없습니다."));
+
         Product product = new Product(
                 request.getName(),
                 request.getCategory(),
                 request.getPrice(),
-                request.getStock()
-//                adminName,
-//                adminEmail
+                request.getStock(),
+                request.getStatus(),
+                admin
         );
 
-        // db에 저장
-        Product saved = productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
 
-        // 엔티티 -> dto로 변환 후 반환
-        return new ProductDetailResponse(saved);
-
+        return new ProductDetailResponse(savedProduct);
     }
 
     // 상품 전체 조회
     @Transactional(readOnly = true)
-    public List<ProductResponse> getAllproducts() {
+    public PageResponse<ProductResponse> getAllproducts(
+            String keyword,
+            String category,
+            String state,
+            int page,
+            int size,
+            String sortBy,
+            String dirention
+    ) { //정렬 조건 만들기
+        Sort sort = dirention.equalsIgnoreCase("desc")  // 정렬 조건이 "desc"
+                ? Sort.by(sortBy).descending()  // 내림차순
+                : Sort.by(sortBy).ascending();   // 오름차순
+        //spring에서는 페이지가 0부터 시작해야 함
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
         // db에서 전체 조회
-        List<Product> products = productRepository.findAll();
+        Page<Product> result = productRepository.findAll(pageable);
 
         // 엔티티 -> dto 변환
-        return products.stream()
-                .map(ProductResponse::new)
-                .collect(Collectors.toList());
+        // mapped -> page 데이터를 변환
+        Page<ProductResponse> mapped = result.map(ProductResponse::new);
+
+        // pageResponse로 변환 -> 반환
+        return new PageResponse<>(
+                mapped.getContent(),   // 데이터 리스트
+                mapped.getNumber() + 1,  // 0페이지 -> 1로
+                mapped.getSize(),          // 페이지당 개수
+                mapped.getTotalElements(),  // 전체 데이터 수
+                mapped.getTotalPages()     // 전체 페이지 수
+        );
     }
 
     // 상품 상세 조회

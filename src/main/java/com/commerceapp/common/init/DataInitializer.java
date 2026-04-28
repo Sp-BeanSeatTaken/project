@@ -4,7 +4,7 @@ import com.commerceapp.common.config.PasswordEncoder;
 import com.commerceapp.customer.entity.Customer;
 import com.commerceapp.customer.repository.CustomerRepository;
 import com.commerceapp.product.entity.Product;
-import com.commerceapp.product.entity.Product.ProductStatus;
+import com.commerceapp.product.enums.ProductStatus;
 import com.commerceapp.product.repository.ProductRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +65,7 @@ public class DataInitializer {
         log.info("고객 20명 생성 및 활성화 완료.");
     }
 
-    // 📦 상품 100개 생성 (카테고리 포함)
+    // 📦 상품 50개 생성 (카테고리 포함)
     private void createProducts() {
 
         String[] names = {"노트북", "키보드", "마우스", "모니터", "헤드셋"};
@@ -75,7 +75,7 @@ public class DataInitializer {
 
         List<Product> products = new ArrayList<>();
 
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= 50; i++) {
 
             String name = names[random.nextInt(names.length)] + " " + i;
             String category = categories[random.nextInt(categories.length)];
@@ -95,11 +95,11 @@ public class DataInitializer {
                 status = ProductStatus.DISCONTINUED;
             }
 
-            Product product = Product.create(name, category, price, stock, status);
+            Product product = new Product(name, category, price, stock, status);
             products.add(product);
         }
 
         productRepository.saveAll(products);
-        log.info("상품 100개 생성 및 활성화 완료. (랜덤으로 품절, 단종 포함)");
+        log.info("상품 50개 생성 및 활성화 완료. (랜덤으로 품절, 단종 포함)");
     }
 }

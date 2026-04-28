@@ -30,7 +30,7 @@ public class AdminController {
         AdminLoginSession loginSession = adminService.login(request);
 
         HttpSession session = httpRequest.getSession(true);
-        session.setAttribute("LoginAdmin", loginSession);
+        session.setAttribute("loginAdmin", loginSession);
         session.setMaxInactiveInterval(864000);
 
         return ResponseEntity.status(HttpStatus.OK).body("로그인 성공!");
@@ -40,7 +40,6 @@ public class AdminController {
     public ResponseEntity<String> logout(HttpServletRequest request) {
 
         HttpSession session = request.getSession(false);
-
 
         if (session != null) {
             session.invalidate();
@@ -59,7 +58,7 @@ public class AdminController {
 
     @GetMapping("/me")
     public ResponseEntity<AdminProfileResponse> getMyProfile(
-            @SessionAttribute(name = "LoginAdmin")
+            @SessionAttribute(name = "loginAdmin")
             AdminLoginSession loginSession){
         AdminProfileResponse response = adminService.getMyProfile(loginSession.getId());
 
@@ -79,7 +78,7 @@ public class AdminController {
     @PatchMapping("/me")
     public ResponseEntity<String> updateMyProfile(
             @Valid @RequestBody AdminMyProfileUpdateRequest request,
-            @SessionAttribute(name = "LoginAdmin")
+            @SessionAttribute(name = "loginAdmin")
             AdminLoginSession loginSession){
 
         adminService.updateMyProfile(loginSession.getId(), request);
@@ -90,7 +89,7 @@ public class AdminController {
     @PatchMapping("/mypassword")
     public ResponseEntity<String> updateMyPassword(
             @Valid @RequestBody AdminMyPasswordUpdateRequest request,
-            @SessionAttribute(name = "LoginAdmin")
+            @SessionAttribute(name = "loginAdmin")
             AdminLoginSession loginSession){
 
         adminService.updateMyPassword(loginSession.getId(), request);
@@ -145,5 +144,4 @@ public class AdminController {
 
         return ResponseEntity.status(HttpStatus.OK).body("계정이 삭제되었습니다.");
     }
-
 }

@@ -2,7 +2,7 @@ package com.commerceapp.order.controller;
 
 import com.commerceapp.admin.dto.AdminLoginSession;
 import com.commerceapp.order.dto.*;
-import com.commerceapp.order.entity.OrderStatus;
+import com.commerceapp.order.entity.enums.OrderStatus;
 import com.commerceapp.order.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

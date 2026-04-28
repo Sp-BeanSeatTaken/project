@@ -1,15 +1,16 @@
 package com.commerceapp.admin.controller;
 
-import com.commerceapp.admin.dto.AdminSignupRequest;
+import com.commerceapp.admin.dto.*;
+import com.commerceapp.admin.enums.AdminRole;
+import com.commerceapp.admin.enums.AdminStatus;
 import com.commerceapp.admin.service.AdminService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,7 +21,187 @@ public class AdminController {
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@Valid @RequestBody AdminSignupRequest request){
+
         adminService.signup(request);
+
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 신청이 완료되었습니다.");
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@Valid @RequestBody AdminLoginRequest request, HttpServletRequest httpRequest){
+        AdminLoginSession loginSession = adminService.login(request);
+
+        HttpSession session = httpRequest.getSession(true);
+        session.setAttribute("loginAdmin", loginSession);
+        session.setMaxInactiveInterval(864000);
+
+        return ResponseEntity.status(HttpStatus.OK).body("로그인 성공!");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return ResponseEntity.ok("성공적으로 로그아웃 되었습니다.");
+    }
+
+    private void validAdmin(AdminLoginSession loginSession){
+        if (loginSession == null){
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+        if (!AdminRole.SUPER.getDatabaseValue().equals(loginSession.getRole())){
+            throw new IllegalStateException("권한이 없습니다.");
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<AdminPageResponse> getAdminList(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) AdminRole role,
+            @RequestParam(required = false) AdminStatus status,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction,
+            @SessionAttribute(name = "loginAdmin", required = false)
+            AdminLoginSession loginSession){
+
+        validAdmin(loginSession);
+
+        AdminPageResponse response = adminService.getAdminList(
+                keyword, role, status, page, size, sortBy, direction);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{adminId}")
+    public ResponseEntity<AdminDetailResponse> getAdminDetail(
+            @PathVariable Long adminId,
+            @SessionAttribute(name = "loginAdmin", required = false)
+            AdminLoginSession loginSession){
+
+        validAdmin(loginSession);
+
+        AdminDetailResponse response = adminService.getAdminDetail(adminId);
+
+        return  ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AdminProfileResponse> getMyProfile(
+            @SessionAttribute(name = "loginAdmin")
+            AdminLoginSession loginSession){
+        AdminProfileResponse response = adminService.getMyProfile(loginSession.getId());
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/{adminId}")
+    public ResponseEntity<String> updateAdmin(
+            @PathVariable Long adminId,
+            @Valid @RequestBody AdminUpdateRequest request){
+
+        adminService.adminUpdate(adminId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body("관리자 정보 수정이 완료되었습니다.");
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<String> updateMyProfile(
+            @Valid @RequestBody AdminMyProfileUpdateRequest request,
+            @SessionAttribute(name = "loginAdmin")
+            AdminLoginSession loginSession){
+
+        adminService.updateMyProfile(loginSession.getId(), request);
+
+        return ResponseEntity.status(HttpStatus.OK).body("프로필 정보가 수정되었습니다.");
+    }
+
+    @PatchMapping("/mypassword")
+    public ResponseEntity<String> updateMyPassword(
+            @Valid @RequestBody AdminMyPasswordUpdateRequest request,
+            @SessionAttribute(name = "loginAdmin")
+            AdminLoginSession loginSession){
+
+        adminService.updateMyPassword(loginSession.getId(), request);
+
+        return ResponseEntity.status(HttpStatus.OK).body("비밀번호가 수정되었습니다.");
+    }
+
+    @PatchMapping("/changerole/{adminId}")
+    public ResponseEntity<String> changeAdminRole(
+            @PathVariable Long adminId,
+            @Valid @RequestBody AdminRoleUpdateRequest request,
+            @SessionAttribute(name = "loginAdmin", required = false)
+            AdminLoginSession loginSession){
+
+        validAdmin(loginSession);
+
+        adminService.changeAdminRole(adminId, request);
+
+         return ResponseEntity.status(HttpStatus.OK).body("관리자 역할 변경이 완료되었습니다.");
+    }
+
+    @PatchMapping("/changestatus/{adminId}")
+    public ResponseEntity<String> changeAdminStatus(
+            @PathVariable Long adminId,
+            @Valid @RequestBody AdminStatusUpdateRequest request,
+            @SessionAttribute(name = "loginAdmin", required = false)
+            AdminLoginSession loginSession){
+
+        validAdmin(loginSession);
+
+        adminService.changeAdminStatus(adminId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body("관리자 상태 변경이 완료되었습니다.");
+    }
+
+    @PatchMapping("/approve/{adminId}")
+    public ResponseEntity<String> approveAdmin(
+            @PathVariable Long adminId,
+            @SessionAttribute(name = "loginAdmin", required = false)
+            AdminLoginSession loginSession) {
+
+        validAdmin(loginSession);
+
+        adminService.approveAdmin(adminId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("관리자 가입이 승인되었습니다.");
+
+    }
+
+    @PatchMapping("/reject/{adminId}")
+    public ResponseEntity<String> rejectAdmin(
+            @PathVariable Long adminId,
+            @Valid @RequestBody AdminRejectReasonRequest request,
+            @SessionAttribute(name = "loginAdmin", required = false)
+            AdminLoginSession loginSession) {
+
+        validAdmin(loginSession);
+
+        adminService.rejectAdmin(adminId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body("관리자 가입이 거부되었습니다.");
+
+    }
+
+    @DeleteMapping("/delete/{adminId}")
+    public ResponseEntity<String> deleteAdmin(
+            @PathVariable Long adminId,
+            @SessionAttribute(name = "loginAdmin", required = false)
+            AdminLoginSession loginSession){
+
+        validAdmin(loginSession);
+
+        adminService.deleteAdmin(adminId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("계정이 삭제되었습니다.");
+    }
+
 }

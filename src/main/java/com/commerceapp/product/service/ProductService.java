@@ -1,10 +1,15 @@
 package com.commerceapp.product.service;
+import com.commerceapp.product.dto.PageResponse;
 import com.commerceapp.product.dto.ProductResponse;
 import com.commerceapp.product.entity.Product;
 import com.commerceapp.product.dto.ProductCreateRequest;
 import com.commerceapp.product.dto.ProductDetailResponse;
 import com.commerceapp.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,14 +46,36 @@ public class ProductService {
 
     // 상품 전체 조회
     @Transactional(readOnly = true)
-    public List<ProductResponse> getAllproducts() {
+    public PageResponse<ProductResponse> getAllproducts(
+            String keyword,
+            String category,
+            String state,
+            int page,
+            int size,
+            String sortBy,
+            String dirention
+    ) { //정렬 조건 만들기
+        Sort sort = dirention.equalsIgnoreCase("desc")  // 정렬 조건이 "desc"
+                ? Sort.by(sortBy).descending()  // 내림차순
+                : Sort.by(sortBy).ascending();   // 오름차순
+        //spring에서는 페이지가 0부터 시작해야 함
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
         // db에서 전체 조회
-        List<Product> products = productRepository.findAll();
+        Page<Product> result = productRepository.findAll(pageable);
 
         // 엔티티 -> dto 변환
-        return products.stream()
-                .map(ProductResponse::new)
-                .collect(Collectors.toList());
+        // mapped -> page 데이터를 변환
+        Page<ProductResponse> mapped = result.map(ProductResponse::new);
+
+        // pageResponse로 변환 -> 반환
+        return new PageResponse<>(
+                mapped.getContent(),   // 데이터 리스트
+                mapped.getNumber() + 1,  // 0페이지 -> 1로
+                mapped.getSize(),          // 페이지당 개수
+                mapped.getTotalElements(),  // 전체 데이터 수
+                mapped.getTotalPages()     // 전체 페이지 수
+        );
     }
 
     // 상품 상세 조회

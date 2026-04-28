@@ -1,9 +1,6 @@
 package com.commerceapp.product.controller;
 
-import com.commerceapp.product.dto.ProductCreateRequest;
-import com.commerceapp.product.dto.ProductDetailResponse;
-import com.commerceapp.product.dto.ProductResponse;
-import com.commerceapp.product.dto.ProductUpdateRequest;
+import com.commerceapp.product.dto.*;
 import com.commerceapp.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +26,29 @@ public class ProductController {
 
     // 상품 전체 조회
     @GetMapping
-    public List<ProductResponse> getAllproducts() {
-        return productService.getAllproducts();
+    public PageResponse<ProductResponse> getAllproducts(
+            // 검색 키워드 ( 상품명)
+            @RequestParam(required = false) String keyword,
+
+            // 카테고리 필터
+            @RequestParam(required = false) String category,
+
+            // 상태 필터
+            @RequestParam(required = false) String state,
+
+            // 페이지 번호
+            @RequestParam(defaultValue = "1") int page,
+
+            // 페이지당 개수
+            @RequestParam(defaultValue = "10") int size,
+
+            // 정렬 기준 -> 등록일
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+
+            // 정렬 방향
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        return productService.getAllproducts(keyword, category, state, page, size, sortBy, direction);
     }
 
 

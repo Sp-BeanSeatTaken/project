@@ -34,7 +34,7 @@ public class CustomerListResponse {
                 customer.getName(),
                 customer.getEmail(),
                 customer.getPhoneNumber(),
-                customer.getStatus(),
+                customer.getStatus().name(),
                 customer.getCreatedAt()
         );
     }

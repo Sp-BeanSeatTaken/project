@@ -7,15 +7,17 @@ import java.util.List;
 
 @Getter
 public class CustomerPageResponse {
-    private List<CustomerListResponse> customers;
+    private List<CustomerListResponse> customerList;
     private int currentPage;
     private long totalCount;
     private int totalPages;
 
     public CustomerPageResponse(Page<CustomerListResponse> page) {
-        this.customers = page.getContent();
+        this.customerList = page.getContent();
         this.currentPage = page.getNumber() + 1;
         this.totalCount = page.getTotalElements();
         this.totalPages = page.getTotalPages();
     }
+
+
 }

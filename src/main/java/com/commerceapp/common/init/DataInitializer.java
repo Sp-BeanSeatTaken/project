@@ -50,7 +50,7 @@ public class DataInitializer {
                     (int)(Math.random() * 10000)
             );
 
-            Customer customer = Customer.create(
+            Customer customer = Customer.createCustomer(
                     "고객" + i,
                     "user" + i + "@test.com",
                     passwordEncoder.encode("1234"),

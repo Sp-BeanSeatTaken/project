@@ -1,6 +1,6 @@
 package com.commerceapp.customer.dto;
+import com.commerceapp.customer.enums.CustomerStatus;
 
-import com.commerceapp.customer.entity.CustomerStatus;
 import lombok.Getter;
 
 /**

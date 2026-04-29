@@ -130,6 +130,9 @@ public class AdminService {
                 () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
         );
 
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        admin.updateMyPassword(encodedPassword);
+
         admin.updateMyPassword(
                 request.getPassword()
         );
@@ -164,6 +167,7 @@ public class AdminService {
         Admin admin = adminRepository.findById(adminId).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 관리자입니다.")
         );
+
         if (!AdminStatus.PENDING.getDisplayName().equals(admin.getStatus())){
             throw new IllegalStateException("승인 대기 상태인 관리자만 거부할 수 있습니다.");
         }

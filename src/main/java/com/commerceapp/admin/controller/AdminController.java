@@ -107,7 +107,11 @@ public class AdminController {
     @PatchMapping("/{adminId}")
     public ResponseEntity<String> updateAdmin(
             @PathVariable Long adminId,
-            @Valid @RequestBody AdminUpdateRequest request){
+            @Valid @RequestBody AdminUpdateRequest request,
+            @SessionAttribute(name = "loginAdmin", required = false)
+            AdminLoginSession loginSession){
+
+        validAdmin(loginSession);
 
         adminService.adminUpdate(adminId, request);
 

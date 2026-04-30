@@ -7,7 +7,6 @@ import lombok.Getter;
 
 @Getter
 public class AdminUpdateRequest {
-
     @NotBlank(message = "이름은 필수 입력입니다.")
     private String name;
 
@@ -18,5 +17,4 @@ public class AdminUpdateRequest {
     @NotBlank(message = "전화번호는 필수 입력입니다.")
     @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "올바른 전화번호 형식이 아닙니다: 010-XXXX-XXXX")
     private String phoneNumber;
-
 }

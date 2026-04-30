@@ -4,6 +4,8 @@ import com.commerceapp.admin.dto.*;
 import com.commerceapp.admin.enums.AdminRole;
 import com.commerceapp.admin.enums.AdminStatus;
 import com.commerceapp.admin.service.AdminService;
+import com.commerceapp.common.exception.ForbiddenException;
+import com.commerceapp.common.exception.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -11,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.security.sasl.AuthenticationException;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,7 +38,7 @@ public class AdminController {
 
         HttpSession session = requestHttp.getSession(true);
         session.setAttribute("loginAdmin", loginSession);
-        session.setMaxInactiveInterval(864000);
+        session.setMaxInactiveInterval(86400);
 
         return ResponseEntity.status(HttpStatus.OK).body("관리자 로그인 성공!");
     }
@@ -48,17 +52,7 @@ public class AdminController {
             session.invalidate();
         }
 
-        return ResponseEntity.ok("성공적으로 로그아웃 되었습니다.");
-    }
-
-    // 슈퍼 관리자 권한인지 확인
-    private void validAdmin(AdminLoginSession loginSession){
-        if (loginSession == null){
-            throw new IllegalStateException("로그인이 필요합니다.");
-        }
-        if (!AdminRole.SUPER.getDisplayName().equals(loginSession.getRole())){
-            throw new IllegalStateException("권한이 없습니다.");
-        }
+        return ResponseEntity.status(HttpStatus.OK).body("성공적으로 로그아웃 되었습니다.");
     }
 
     // 관리자 리스트 조회
@@ -99,8 +93,12 @@ public class AdminController {
     // 관리자 내 프로필 조회
     @GetMapping("/me")
     public ResponseEntity<AdminProfileResponse> getMyProfile(
-            @SessionAttribute(name = "loginAdmin")
+            @SessionAttribute(name = "loginAdmin", required = false)
             AdminLoginSession loginSession){
+        if (loginSession == null) {
+            throw new UnauthorizedException("관리자 로그인이 필요합니다");
+        }
+
         AdminProfileResponse response = adminService.getMyProfile(loginSession.getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -113,6 +111,9 @@ public class AdminController {
             @Valid @RequestBody AdminUpdateRequest request,
             @SessionAttribute(name = "loginAdmin", required = false)
             AdminLoginSession loginSession){
+        if (loginSession == null) {
+            throw new UnauthorizedException("관리자 로그인이 필요합니다");
+        }
 
         // 슈퍼관리자 권한 검증
         validAdmin(loginSession);
@@ -128,6 +129,9 @@ public class AdminController {
             @Valid @RequestBody AdminMyProfileUpdateRequest request,
             @SessionAttribute(name = "loginAdmin")
             AdminLoginSession loginSession){
+        if (loginSession == null) {
+            throw new UnauthorizedException("관리자 로그인이 필요합니다");
+        }
 
         adminService.updateMyProfile(loginSession.getId(), request);
 
@@ -222,5 +226,15 @@ public class AdminController {
         adminService.deleteAdmin(adminId);
 
         return ResponseEntity.status(HttpStatus.OK).body("계정이 삭제되었습니다.");
+    }
+
+    // 슈퍼 관리자 권한인지 확인
+    private void validAdmin(AdminLoginSession loginSession){
+        if (loginSession == null){
+            throw new UnauthorizedException("관리자 로그인이 필요합니다.");
+        }
+        if (!AdminRole.SUPER.getDisplayName().equals(loginSession.getRole())){
+            throw new ForbiddenException("권한이 없습니다.");
+        }
     }
 }

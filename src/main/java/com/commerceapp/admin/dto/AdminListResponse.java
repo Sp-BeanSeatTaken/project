@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @JsonPropertyOrder({"id","name","email","phoneNumber", "role", "status", "createdAt", "approvedAt"})
 public class AdminListResponse {
-
     private final Long id;
     private final String name;
     private final String email;

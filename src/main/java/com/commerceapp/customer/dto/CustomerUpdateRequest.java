@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 public class CustomerUpdateRequest {
-    private String name; /* 수정할 이름 */
-    private String email; /* 수정할 이메일 */
-    private String phoneNumber; /* 수정할 전화번호 */
+    private String name;
+    private String email;
+    private String phoneNumber;
 }

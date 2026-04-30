@@ -58,7 +58,7 @@ public class CustomerController {
         // 3. 세션에 고객 정보 저장
         HttpSession session = requestHttp.getSession(true);
         session.setAttribute("loginCustomer", loginSession);
-        session.setMaxInactiveInterval(864000);
+        session.setMaxInactiveInterval(86400);
 
         // 4. 로그인 성공 응답 반환 (200 OK)
         return ResponseEntity.status(HttpStatus.OK).body("고객 로그인 성공!");

@@ -1,4 +1,5 @@
 package com.commerceapp.customer.dto;
+
 import com.commerceapp.customer.enums.CustomerStatus;
 
 import lombok.Getter;

@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 @Getter
 // 공통 에러 응답 dto
 public class ErrorResponse {
-
     private final LocalDateTime timestamp; // 에러 발생 시간
     private final int status; // HTTP 상태 코드
     private final String error; // 에러 이름

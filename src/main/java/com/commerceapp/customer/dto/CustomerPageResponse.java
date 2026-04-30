@@ -18,6 +18,4 @@ public class CustomerPageResponse {
         this.totalCount = page.getTotalElements();
         this.totalPages = page.getTotalPages();
     }
-
-
 }

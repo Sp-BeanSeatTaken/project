@@ -30,7 +30,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -45,14 +44,15 @@ public class OrderService {
      */
     @Transactional
     public OrderResponse createOrder(OrderCreateRequest request, HttpSession session) {
-        if (session == null) {
-            throw new UnauthorizedException("로그인이 필요합니다.");
+        CustomerLoginSession loginSession = (CustomerLoginSession) session.getAttribute("loginCustomer");
+        AdminLoginSession loginAdminSession = (AdminLoginSession) session.getAttribute("loginAdmin");
+
+        if (loginAdminSession != null) {
+            throw new UnauthorizedException("관리자는 CS 주문 생성 탭에서 주문해 주세요.");
         }
 
-        CustomerLoginSession loginSession = (CustomerLoginSession) session.getAttribute("loginCustomer");
-
         if (loginSession == null) {
-            throw new UnauthorizedException("로그인이 필요합니다.");
+            throw new UnauthorizedException("고객 로그인이 필요합니다.");
         }
 
         Customer customer = customerRepository.findById(loginSession.getCustomerId())

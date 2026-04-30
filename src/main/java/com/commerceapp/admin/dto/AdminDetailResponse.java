@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @JsonPropertyOrder({"name","email","phoneNumber","role", "status", "createdAt", "approvedAt"})
 public class AdminDetailResponse {
-
     private final String name;
     private final String email;
     private final String phoneNumber;
@@ -41,5 +40,4 @@ public class AdminDetailResponse {
                 admin.getApprovedAt()
         );
     }
-
 }

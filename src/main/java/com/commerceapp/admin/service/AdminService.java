@@ -6,6 +6,8 @@ import com.commerceapp.admin.enums.AdminRole;
 import com.commerceapp.admin.enums.AdminStatus;
 import com.commerceapp.admin.repository.AdminRepository;
 import com.commerceapp.common.config.PasswordEncoder;
+import com.commerceapp.common.exception.ConflictException;
+import com.commerceapp.common.exception.ForbiddenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +29,7 @@ public class AdminService {
     @Transactional
     public void adminSignup(AdminSignupRequest request){
         if (adminRepository.existsByEmail(request.getEmail())){
-            throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
+            throw new ConflictException("이미 사용중인 이메일입니다.");
         }
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
@@ -53,9 +55,8 @@ public class AdminService {
             throw new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
 
-
         if (!admin.getStatus().isLogin()) {
-            throw new IllegalStateException(admin.getStatus().getMessage());
+            throw new ForbiddenException(admin.getStatus().getMessage());
         }
 
         return AdminLoginSession.from(admin);
@@ -69,8 +70,7 @@ public class AdminService {
 
         Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
         Pageable pageable = PageRequest.of(page -1, size, sort);
-        String roleValue = (role != null) ? role.getDisplayName() : null;
-        String statusValue = (status != null) ? status.getDisplayName() : null;
+
         Page<Admin> adminPage = adminRepository.searchAdmins(keyword, role, status, pageable);
 
         return AdminPageResponse.from(adminPage);
@@ -178,7 +178,7 @@ public class AdminService {
         );
 
         if (admin.getStatus() != AdminStatus.PENDING){
-            throw new IllegalStateException("승인대기 상태인 관리자만 승인할 수 있습니다.");
+            throw new ForbiddenException("승인대기 상태인 관리자만 승인할 수 있습니다.");
         }
 
         admin.activate(LocalDateTime.now());

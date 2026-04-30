@@ -21,7 +21,7 @@ public class OrderController {
     // 고객 주문 생성
     @PostMapping
     public ResponseEntity<OrderResponse> createOrderbyUser(
-            @Valid @RequestBody OrderCreateRequest request,
+            @RequestBody OrderCreateRequest request,
             HttpSession session
     ) {
         return ResponseEntity.ok(orderService.createOrder(request, session));
@@ -30,7 +30,7 @@ public class OrderController {
     // CS 주문 생성
     @PostMapping("/admin")
     public ResponseEntity<OrderResponse> createOrderByAdmin(
-            @RequestBody OrderCreateByAdminRequest request,
+            @Valid @RequestBody OrderCreateByAdminRequest request,
             HttpSession session
     ) {
         return ResponseEntity.ok(orderService.createOrderByAdmin(request, session));

@@ -1,6 +1,7 @@
 package com.commerceapp.common.config;
 
 import com.commerceapp.common.dto.ErrorResponse;
+import com.commerceapp.common.exception.ConflictException;
 import com.commerceapp.common.exception.ForbiddenException;
 import com.commerceapp.common.exception.NotFoundException;
 import com.commerceapp.common.exception.UnauthorizedException;
@@ -125,6 +126,22 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
+                .body(errorResponse);
+    }
+
+    // 409 Conflict
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(ConflictException e, HttpServletRequest request) {
+        log.warn("Conflict Exception: {}", e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.name(),
+                "요청 충돌: " +e.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(errorResponse);
     }
 }
